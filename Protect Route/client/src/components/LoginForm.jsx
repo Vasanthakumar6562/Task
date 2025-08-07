@@ -20,6 +20,8 @@ const LoginForm = () => {
     e.preventDefault();
     try {
       const result = await login(formData)
+      console.log("Login result:", result);
+
       setFormData({
          email: '',
     password: ''

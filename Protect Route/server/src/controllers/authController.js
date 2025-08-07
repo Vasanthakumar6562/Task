@@ -21,12 +21,19 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email,password);
+  
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+        // 🔐 Make sure JWT_SECRET is defined
+    console.log("JWT_SECRET:", process.env.JWT_SECRET);
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ message: "JWT_SECRET not set in .env" });
+    }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '10d' });
 
@@ -34,7 +41,11 @@ exports.login = async (req, res) => {
       token,
       user: { id: user._id, name: user.name, email: user.email }
     });
+    console.log(token);
+    
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+
